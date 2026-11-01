@@ -210,8 +210,9 @@
     const enabled = Game.ads.isEnabled() && !!provider;
     const granted = enabled && Game.ads.hasConsent();
 
-    // Con consentimiento se pone en marcha el proveedor y el banner; sin él (o si se retira) no queda nada.
-    if (granted) {
+    // Con consentimiento (y pasados los primeros segundos) se pone en marcha el proveedor y el banner; sin él (o si se retira) no queda nada.
+    const delayed = Game.ads.startDelayPassed(performance.now()); // performance.now() cuenta desde que se abrió la página
+    if (granted && delayed) {
       if (!started) {
         started = true;
         if (provider.load) provider.load();
@@ -219,12 +220,12 @@
       if (cfg.banner && bannerState === 'none' && provider.mountBanner) {
         bannerState = provider.mountBanner(els['ad-banner']) === false ? 'failed' : 'shown';
       }
-    } else if (bannerState !== 'none') {
+    } else if (!granted && bannerState !== 'none') {
       els['ad-banner'].replaceChildren();
       bannerState = 'none';
     }
 
-    const askConsent = enabled && Game.ads.needsConsent() && Game.isIntroDone();
+    const askConsent = enabled && delayed && Game.ads.needsConsent();
     setHidden(els['ad-consent'], !askConsent);
     setHidden(els['ad-banner'], bannerState !== 'shown');
     setHidden(els['ad-dock'], !askConsent && bannerState !== 'shown');

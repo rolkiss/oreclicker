@@ -46,7 +46,16 @@
     if (mission.clicks !== undefined) { have = s.totalClicks; need = mission.clicks; }
     else if (mission.producer !== undefined) { have = s.producers[mission.producer]; need = mission.count; }
     else if (mission.upgrades !== undefined) { have = Object.keys(s.upgrades).length; need = mission.upgrades; }
-    else { have = s.totalEarned; need = Game.minerals[mineralIndex[mission.mineral]].unlockAt; } // mineral: llegar a su umbral
+    else {
+      // mineral: llegar a su umbral. La barra usa la misma escala logarítmica que la del HUD (Game.getMineralProgress),
+      // para que las dos barras de "llegar a este mineral" muestren lo mismo.
+      const index = mineralIndex[mission.mineral];
+      have = s.totalEarned;
+      need = Game.minerals[index].unlockAt;
+      const from = Math.max(index > 0 ? Game.minerals[index - 1].unlockAt : 0, 1);
+      const fraction = have >= need || need <= from ? 1 : Math.min(Math.max(Math.log(Math.max(have, 1) / from) / Math.log(need / from), 0), 1);
+      return { have: Math.min(have, need), need, fraction };
+    }
     have = Math.min(have, need);
     return { have, need, fraction: need > 0 ? have / need : 1 };
   };

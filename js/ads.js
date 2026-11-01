@@ -20,6 +20,8 @@
   Game.ads.registerProvider = (name, impl) => { providers[name] = impl; };
   Game.ads.getProvider = () => providers[Game.ads.providerName()] || null;
   Game.ads.isEnabled = () => Game.ads.providerName() !== 'none';
+  // ¿Ha pasado ya el tiempo de gracia desde que se abrió la web? (`elapsedMs` = tiempo desde la carga de la página)
+  Game.ads.startDelayPassed = (elapsedMs) => elapsedMs >= cfg.startDelaySeconds * 1000;
 
   // ── Consentimiento: nada se carga hasta que el jugador acepta ──
   Game.ads.getConsent = () => Game.state.settings.adsConsent;

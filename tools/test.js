@@ -573,6 +573,17 @@ const throwsMessage = (fn) => { try { fn(); return null; } catch (e) { return e.
   s.totalEarned = G.minerals[1].unlockAt; done = G.checkIntro();
   ok(done.length === 1 && G.isIntroDone() && G.getIntroMission() === null && G.checkIntro().length === 0, 'la última cierra el recorrido');
   ok(G.getIntroProgress(mc.intro[3]).fraction === 1 && G.getIntroProgress(mc.intro[3]).have <= G.getIntroProgress(mc.intro[3]).need, 'el progreso no pasa de la meta');
+  {
+    const mission = mc.intro[3];
+    const target = G.minerals.findIndex((m) => m.id === mission.mineral);
+    for (const earned of [0, 1, 500, 11_400, G.minerals[target].unlockAt - 1]) {
+      s.totalEarned = earned;
+      const mp = G.getMineralProgress();
+      const ip = G.getIntroProgress(mission);
+      ok(mp.index !== target - 1 || near(ip.fraction, mp.fraction), 'la barra de la misión de mineral coincide con la del HUD (' + earned + ')');
+      ok(ip.fraction >= 0 && ip.fraction < 1, 'sin llegar al umbral la misión no está completa (' + earned + ')');
+    }
+  }
 
   // Fechas y racha
   setDay(2026, 10, 31); ok(G.dayKey() === '2026-10-31', 'dayKey da la fecha local');
@@ -1256,6 +1267,7 @@ const throwsMessage = (fn) => { try { fn(); return null; } catch (e) { return e.
   // Config y valores por defecto
   ok(['none', 'adsterra', 'adsense', 'test'].includes(ac.provider), 'proveedor de anuncios conocido');
   ok(ac.rewards.boost.mult > 1 && ac.rewards.boost.seconds > 0 && ac.rewards.boost.cooldown >= ac.rewards.boost.seconds, 'frenesí por anuncio coherente (el espacio entre anuncios no baja de su duración)');
+  ok(ac.startDelaySeconds === 10 && !G.ads.startDelayPassed(9999) && G.ads.startDelayPassed(10000) && G.ads.startDelayPassed(60000), 'los anuncios empiezan a los 10 s de entrar en la web');
   ok(keep !== 'test', "nunca se publica con el proveedor de prueba (da recompensas gratis)");
   let s = fresh();
   setProvider('none');
@@ -1331,7 +1343,7 @@ const throwsMessage = (fn) => { try { fn(); return null; } catch (e) { return e.
   global.location = { hostname: '127.0.0.1', search: '?ads=test' }; ok(G.ads.providerName() === 'test', 'también en 127.0.0.1');
   global.location = { hostname: 'mi-juego.example', search: '?ads=test' }; ok(G.ads.providerName() === 'none', 'en un sitio publicado se ignora (no hay recompensas gratis)');
   global.location = { hostname: 'localhost', search: '' }; ok(G.ads.providerName() === 'none', 'sin el parámetro, el configurado');
-  global.location = { hostname: '26.151.142.144', search: '?ads=test' }; ok(G.ads.providerName() === 'none', 'una IP que no es local tampoco');
+  global.location = { hostname: '203.0.113.7', search: '?ads=test' }; ok(G.ads.providerName() === 'none', 'una IP que no es local tampoco');
   delete global.location;
 
   // Guardado

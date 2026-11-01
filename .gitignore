@@ -18,12 +18,27 @@ GDD.md
 .env.*
 !.env.example
 
-# Credenciales y certificados
+# Credenciales, claves privadas y certificados
 *.pem
 *.key
 *.p12
 *.pfx
+*.crt
+*.cer
+*.csr
+*.jks
+*.keystore
+id_rsa*
+id_ed25519*
+.npmrc
+.netrc
+credentials*.json
+service-account*.json
+secrets.*
 
 # Copias de seguridad locales
 *.bak
 *.backup
+
+# Notas internas de desarrollo (no se publican)
+NOTAS-DESARROLLO.md
