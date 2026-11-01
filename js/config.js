@@ -192,7 +192,7 @@ Game.config = {
     adsterra: { key: '330411031c68ccc27bd53664868d6d7c', src: 'https://bauval.org/22/330411031c68ccc27bd53664868d6d7c', width: 320, height: 50 }, // el código de «Banner» de tu panel de Adsterra
     adsense: { client: '', bannerSlot: '' }, // ca-pub-… de tu cuenta y el id del bloque de anuncio del banner
     banner: true, // banner discreto abajo (solo con proveedor y consentimiento)
-    startDelaySeconds: 10, // el aviso de consentimiento y el banner aparecen a los 10 s de entrar en la web
+    startDelaySeconds: 1, // el aviso de consentimiento y el banner aparecen a 1 s de entrar en la web
     testSeconds: 3, // lo que dura el anuncio de prueba
     rewards: {
       offline: { enabled: true }, // duplicar las ganancias de estar fuera

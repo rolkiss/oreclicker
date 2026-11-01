@@ -1267,7 +1267,7 @@ const throwsMessage = (fn) => { try { fn(); return null; } catch (e) { return e.
   // Config y valores por defecto
   ok(['none', 'adsterra', 'adsense', 'test'].includes(ac.provider), 'proveedor de anuncios conocido');
   ok(ac.rewards.boost.mult > 1 && ac.rewards.boost.seconds > 0 && ac.rewards.boost.cooldown >= ac.rewards.boost.seconds, 'frenesí por anuncio coherente (el espacio entre anuncios no baja de su duración)');
-  ok(ac.startDelaySeconds === 10 && !G.ads.startDelayPassed(9999) && G.ads.startDelayPassed(10000) && G.ads.startDelayPassed(60000), 'los anuncios empiezan a los 10 s de entrar en la web');
+  ok(ac.startDelaySeconds === 1 && !G.ads.startDelayPassed(999) && G.ads.startDelayPassed(1000) && G.ads.startDelayPassed(60000), 'los anuncios empiezan a 1 s de entrar en la web');
   ok(keep !== 'test', "nunca se publica con el proveedor de prueba (da recompensas gratis)");
   let s = fresh();
   setProvider('none');
@@ -1292,7 +1292,8 @@ const throwsMessage = (fn) => { try { fn(); return null; } catch (e) { return e.
   ok(G.ads.isEnabled() && G.ads.needsConsent() && !G.ads.hasConsent(), 'con proveedor y sin elegir: hay que pedir consentimiento');
   ok(!G.ads.canOffer('offline') && !G.ads.canOffer('gift') && !G.ads.canOffer('boost'), 'sin consentimiento no se ofrece ningún anuncio');
   ok(!G.ads.setConsent('quizá') && G.ads.getConsent() === 'unset', 'un valor raro no cambia la elección');
-  ok(G.ads.setConsent('denied') && !G.ads.hasConsent() && !G.ads.needsConsent() && !G.ads.canOffer('offline'), 'rechazar: no se pregunta más y no se ofrece nada');
+  ok(G.ads.setConsent('denied') && !G.ads.hasConsent() && G.ads.needsConsent() && !G.ads.canOffer('offline'), 'sin aceptar se sigue pidiendo (no se juega) y no se ofrece nada');
+  ok(G.ads.setConsent('unset') && G.ads.needsConsent() && G.ads.setConsent('granted') && !G.ads.needsConsent(), 'al aceptar deja de pedirse');
   ok(G.ads.setConsent('granted') && G.ads.hasConsent() && G.ads.canOffer('offline') && G.ads.canOffer('gift') && G.ads.canOffer('boost'), 'aceptar: se ofrecen los tres anuncios');
   ready = false; ok(!G.ads.canOffer('offline'), 'sin anuncio listo en el proveedor no se ofrece'); ready = true;
   ac.rewards.gift.enabled = false; ok(!G.ads.canOffer('gift') && G.ads.canOffer('offline'), 'un anuncio se puede apagar por separado'); ac.rewards.gift.enabled = true;

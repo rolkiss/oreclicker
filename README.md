@@ -12,7 +12,7 @@ para llevarte la partida a otro dispositivo o navegador.
 
 ## Privacidad y anuncios
 
-El juego muestra un banner de publicidad discreto solo si lo aceptas, y puedes cambiarlo cuando quieras en Opciones → Anuncios.
+Para jugar hay que aceptar el banner de publicidad discreto que muestra el juego (se pide nada más entrar).
 Los detalles están en la [política de privacidad](privacy.html). Dudas: contact@oreclicker.com
 
 ## Ejecutarlo en tu equipo

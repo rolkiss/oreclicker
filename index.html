@@ -106,14 +106,16 @@
 
   <!-- Anuncios: solo se enseñan con un proveedor configurado (config.ads.provider) y, el banner, con permiso del jugador. -->
   <div id="ad-dock" class="ad-dock" hidden>
-    <div id="ad-consent" class="ad-consent" role="region" aria-labelledby="ad-consent-text" hidden>
-      <p id="ad-consent-text" class="ad-consent-text"><span data-i18n="ads.consentText"></span> <a href="privacy.html" target="_blank" rel="noopener" data-i18n="ads.privacyLink"></a></p>
-      <div class="opt-row ad-consent-actions">
-        <button id="ad-accept" class="btn btn-small can-buy" type="button" data-i18n="ads.accept"></button>
-        <button id="ad-decline" class="btn btn-small" type="button" data-i18n="ads.decline"></button>
-      </div>
-    </div>
     <div id="ad-banner" class="ad-banner" hidden></div>
+  </div>
+
+  <div id="ad-gate" class="modal ad-gate" data-locked="true" hidden>
+    <div class="modal-card" role="alertdialog" aria-modal="true" aria-labelledby="ad-gate-title" aria-describedby="ad-gate-text">
+      <h2 id="ad-gate-title" class="modal-title" data-i18n="ads.gateTitle"></h2>
+      <p id="ad-gate-text" class="modal-lead" data-i18n="ads.gateText"></p>
+      <p class="opt-hint"><a href="privacy.html" target="_blank" rel="noopener" data-i18n="ads.privacyLink"></a></p>
+      <button id="ad-accept" class="modal-button" type="button" data-i18n="ads.accept"></button>
+    </div>
   </div>
 
   <div id="offline" class="modal" hidden>
@@ -276,13 +278,6 @@
         <h3 class="opt-title" data-i18n="options.numbers"></h3>
         <div id="notation-select" class="seg" role="group" data-i18n-attr="aria-label:options.numbers"></div>
         <p id="notation-example" class="opt-hint"></p>
-      </section>
-
-      <section id="opt-ads" class="opt" hidden>
-        <h3 class="opt-title" data-i18n="ads.title"></h3>
-        <div id="ads-select" class="seg" role="group" data-i18n-attr="aria-label:ads.title"></div>
-        <p id="ads-hint" class="opt-hint"></p>
-        <p class="opt-hint"><a href="privacy.html" target="_blank" rel="noopener" data-i18n="ads.privacyLink"></a></p>
       </section>
 
       <section class="opt">

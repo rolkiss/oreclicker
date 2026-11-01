@@ -26,7 +26,8 @@
   // ── Consentimiento: nada se carga hasta que el jugador acepta ──
   Game.ads.getConsent = () => Game.state.settings.adsConsent;
   Game.ads.hasConsent = () => Game.state.settings.adsConsent === 'granted';
-  Game.ads.needsConsent = () => Game.ads.isEnabled() && Game.state.settings.adsConsent === 'unset';
+  // Con proveedor, hay que haber aceptado para jugar (la ventana de aviso no se puede cerrar sin aceptar).
+  Game.ads.needsConsent = () => Game.ads.isEnabled() && Game.state.settings.adsConsent !== 'granted';
   Game.ads.setConsent = function (value) {
     if (value !== 'granted' && value !== 'denied' && value !== 'unset') return false;
     Game.state.settings.adsConsent = value;

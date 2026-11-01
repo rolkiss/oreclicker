@@ -8,11 +8,9 @@
   const cfg = config.ads;
 
   const els = {};
-  const consentButtons = []; // { node, value }
   let busy = false; // hay un anuncio en curso: los botones esperan
   let started = false; // el proveedor ya se puso en marcha (solo ocurre con consentimiento)
   let bannerState = 'none'; // 'none' | 'shown' | 'failed'
-  let reloadNote = false; // se rechazó con el script ya cargado: ofrecer recargar
   let offlineSummary = null; // el aviso de bienvenida abierto, para duplicarlo
 
   function setText(node, text) {
@@ -135,14 +133,12 @@
 
   // ── Arranque ──────────────────────────────────────────────
   function init() {
-    for (const id of ['ad-dock', 'ad-consent', 'ad-accept', 'ad-decline', 'ad-banner', 'ad-boost',
-                      'offline', 'offline-double', 'gift-double', 'missions', 'gift-claim', 'options', 'opt-ads',
-                      'ads-select', 'ads-hint']) {
+    for (const id of ['ad-dock', 'ad-gate', 'ad-accept', 'ad-banner', 'ad-boost',
+                      'offline', 'offline-double', 'gift-double', 'missions', 'gift-claim']) {
       els[id] = $(id);
     }
 
-    els['ad-accept'].addEventListener('click', () => choose('granted'));
-    els['ad-decline'].addEventListener('click', () => choose('denied'));
+    els['ad-accept'].addEventListener('click', accept);
     els['offline-double'].addEventListener('click', () => watch('offline', () => {
       const earned = Game.claimOfflineBonus(offlineSummary);
       if (earned > 0) Game.achievementsPanel.toast(tr('missions.toastClaimed', { n: formatNumber(Math.floor(earned)) }));
@@ -155,15 +151,7 @@
       if (Game.grantAdBoost()) Game.achievementsPanel.toast(tr('ads.boostDone', { n: formatNumber(cfg.rewards.boost.mult), t: Game.formatDuration(cfg.rewards.boost.seconds) }));
     }));
 
-    for (const value of ['granted', 'denied']) {
-      const node = el('button', 'seg-btn');
-      node.type = 'button';
-      node.addEventListener('click', () => choose(value));
-      consentButtons.push({ node, value });
-      els['ads-select'].append(node);
-    }
-
-    // El dock (aviso o banner) va fijo abajo: reserva su alto para que no tape la tienda.
+    // El dock (el banner) va fijo abajo: reserva su alto para que no tape la tienda.
     if (typeof ResizeObserver === 'function') {
       new ResizeObserver(() => {
         document.documentElement.style.setProperty('--ad-h', (els['ad-dock'].hidden ? 0 : els['ad-dock'].offsetHeight) + 'px');
@@ -179,9 +167,9 @@
     offlineSummary = summary;
   }
 
-  function choose(value) {
-    reloadNote = value === 'denied' && started;
-    Game.ads.setConsent(value);
+  // Aceptar es obligatorio para jugar: la ventana no tiene otra salida.
+  function accept() {
+    Game.ads.setConsent('granted');
     Game.storage.save();
     Game.ui.render();
   }
@@ -225,14 +213,19 @@
       bannerState = 'none';
     }
 
+    // Sin aceptar no se juega: una ventana en el centro, sin cerrar, que tapa el juego (y bloquea sus atajos y el Tab).
     const askConsent = enabled && delayed && Game.ads.needsConsent();
-    setHidden(els['ad-consent'], !askConsent);
+    if (askConsent && els['ad-gate'].hidden) {
+      Game.ui.openModal(els['ad-gate'], els['ad-accept']);
+    } else if (!askConsent && !els['ad-gate'].hidden) {
+      els['ad-gate'].dataset.locked = 'false';
+      Game.ui.closeModal(els['ad-gate']);
+      els['ad-gate'].dataset.locked = 'true';
+    }
     setHidden(els['ad-banner'], bannerState !== 'shown');
-    setHidden(els['ad-dock'], !askConsent && bannerState !== 'shown');
+    setHidden(els['ad-dock'], bannerState !== 'shown');
 
     renderButtons();
-    setHidden(els['opt-ads'], !enabled);
-    if (enabled && !els.options.hidden) renderOptions();
   }
 
   function renderButtons() {
@@ -254,15 +247,6 @@
     }
 
     for (const id of ['offline-double', 'gift-double', 'ad-boost']) els[id].setAttribute('aria-disabled', String(busy));
-  }
-
-  function renderOptions() {
-    const consent = Game.ads.getConsent();
-    for (const b of consentButtons) {
-      setText(b.node, tr(b.value === 'granted' ? 'ads.on' : 'ads.off'));
-      b.node.setAttribute('aria-pressed', String(b.value === consent));
-    }
-    setText(els['ads-hint'], tr('ads.status.' + consent) + (reloadNote && consent === 'denied' ? ' ' + tr('ads.reloadNote') : ''));
   }
 
   Game.adsUi = { init, offerOffline };

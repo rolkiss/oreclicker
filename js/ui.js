@@ -468,6 +468,7 @@
   }
 
   function closeModal(modal) {
+    if (modal.dataset.locked === 'true') return; // ventana que no se puede cerrar (la del aviso de anuncios)
     modal.hidden = true;
     modal.style.zIndex = '';
     const i = openModals.findIndex((m) => m.modal === modal);

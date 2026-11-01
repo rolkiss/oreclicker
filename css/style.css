@@ -1234,16 +1234,14 @@ h2 { margin: 0; }
   border-top: 1px solid var(--line);
   background: color-mix(in srgb, var(--bg-deep) 94%, transparent);
 }
-.ad-dock[hidden], .ad-consent[hidden], .ad-banner[hidden] { display: none; }
+.ad-dock[hidden], .ad-banner[hidden] { display: none; }
 
 .ad-banner { width: 320px; max-width: 100%; height: 50px; overflow: hidden; text-align: center; }
 .ad-frame { display: block; margin: 0 auto; border: 0; }
 .ad-banner-test { display: grid; place-items: center; height: 100%; border: 1px dashed var(--line); border-radius: 8px; color: var(--muted); font-size: 0.8rem; }
 
-.ad-consent { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px 14px; max-width: 760px; font-size: 0.82rem; }
-.ad-consent-text { flex: 1 1 280px; margin: 0; color: var(--muted); }
-.ad-consent-actions { margin-top: 0; flex: none; }
-.ad-consent a, .opt-hint a { color: var(--accent); }
+.ad-gate a, .opt-hint a { color: var(--accent); }
+.ad-gate { z-index: 250; }
 
 .ad-boost { align-self: center; margin-top: 2px; }
 .ad-reward { width: 100%; min-height: 40px; margin: 0 0 8px; border-color: color-mix(in srgb, #ff8c3d 55%, var(--line)); }
