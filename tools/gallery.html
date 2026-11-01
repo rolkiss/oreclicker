@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Galería de gemas</title>
+  <!-- Herramienta de desarrollo: dibuja las 32 gemas del juego para revisarlas (abrir con el servidor local). -->
+  <style>
+    :root { --accent: #9aa0a6; --accent-glow: transparent; --glow: 0.4; }
+    body { margin: 0; padding: 16px; background: #14110f; color: #efe7dc; font: 14px system-ui, sans-serif; }
+    h1 { margin: 0 0 12px; font-size: 1.1rem; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+    .cell { padding: 8px; border: 1px solid #3a322b; border-radius: 12px; background: #221d19; text-align: center; }
+    .cell svg { display: block; width: 100%; height: auto; overflow: visible; filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.5)); }
+    .cell small { display: block; color: #a39685; }
+    .gem-spin { transform-box: view-box; transform-origin: 50% 50%; animation: spin 40s linear infinite; }
+    .gem-glint { transform-box: fill-box; transform-origin: center; animation: glint 3.2s ease-in-out infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes glint { 0%, 70%, 100% { opacity: 0; transform: scale(0.4); } 80% { opacity: 1; transform: scale(1.1) rotate(20deg); } }
+  </style>
+</head>
+<body>
+  <h1>Galería de gemas (32 minerales)</h1>
+  <div id="grid" class="grid"></div>
+  <script src="../js/config.js"></script>
+  <script src="../js/lang/es.js"></script>
+  <script src="../js/lang/en.js"></script>
+  <script src="../js/i18n.js"></script>
+  <script src="../js/format.js"></script>
+  <script src="../js/state.js"></script>
+  <script src="../js/minerals.js"></script>
+  <script src="../js/gem.js"></script>
+  <script>
+    const grid = document.getElementById('grid');
+    Game.minerals.forEach((m, i) => {
+      const cell = document.createElement('div');
+      cell.className = 'cell';
+      cell.append(Game.gem.toSvg(m, i));
+      const label = document.createElement('small');
+      label.textContent = (i + 1) + '. ' + Game.mineralName(m) + ' · ' + m.shape;
+      cell.append(label);
+      grid.append(cell);
+    });
+  </script>
+</body>
+</html>

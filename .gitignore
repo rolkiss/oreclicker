@@ -1,0 +1,29 @@
+# Generado por tools/build-site.js
+dist/
+node_modules/
+
+# Configuración local de las herramientas, sistema y editores
+.claude/
+.DS_Store
+Thumbs.db
+*.log
+.vscode/
+.idea/
+
+# Documentos internos (no se publican)
+GDD.md
+
+# Variables de entorno y secretos
+.env
+.env.*
+!.env.example
+
+# Credenciales y certificados
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Copias de seguridad locales
+*.bak
+*.backup

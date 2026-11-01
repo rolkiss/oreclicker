@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#14110f">
+  <title>Ore Clicker</title>
+  <meta name="description" content="Un clicker de minería: pica la roca, compra 50 productores, desciende por 7 biomas, renace y completa retos. Gratis, sin registro.">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Ore Clicker">
+  <meta property="og:title" content="Ore Clicker">
+  <meta property="og:description" content="Un clicker de minería: pica la roca, compra 50 productores, desciende por 7 biomas y renace. Gratis, sin registro.">
+  <meta property="og:url" content="https://oreclicker.com">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Ore Clicker">
+  <meta name="twitter:description" content="Un clicker de minería: pica la roca, compra 50 productores, desciende por 7 biomas y renace. Gratis, sin registro.">
+  <link rel="canonical" href="https://oreclicker.com">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="dust" class="dust" aria-hidden="true"></div>
+  <!-- Los textos con data-i18n se rellenan desde js/lang/ (Game.i18n.applyStatic). -->
+  <div class="app">
+
+    <header class="hud">
+      <button id="achievements-open" class="icon-button icon-left" type="button" data-i18n-attr="aria-label:ach.open;title:ach.open">🏆</button>
+      <button id="missions-open" class="icon-button icon-left icon-missions" type="button" hidden data-i18n-attr="aria-label:missions.open;title:missions.open">📋<span id="missions-badge" class="badge" hidden></span></button>
+      <button id="dex-open" class="icon-button icon-left icon-dex" type="button" data-i18n-attr="aria-label:dex.open;title:dex.open">📖<span id="dex-badge" class="badge" hidden></span></button>
+      <button id="prestige-open" class="icon-button icon-left icon-prestige" type="button" hidden data-i18n-attr="aria-label:prestige.open;title:prestige.open">🔄<span id="prestige-badge" class="badge" hidden></span></button>
+      <button id="sound-toggle" class="icon-button icon-sound" type="button">🔊</button>
+      <button id="options-open" class="icon-button" type="button" data-i18n-attr="aria-label:options.title;title:options.title">⚙️</button>
+      <div class="hud-top">
+        <div class="hud-currency">
+          <span id="currency" class="hud-value">0</span>
+          <span id="currency-name" class="hud-unit"></span>
+        </div>
+        <div id="boost" class="boost" role="status" hidden></div>
+        <button id="ad-boost" class="btn btn-small can-buy ad-boost" type="button" hidden></button>
+        <div id="biome-name" class="biome-name"></div>
+        <div class="hud-mineral">
+          <span id="mineral-icon" aria-hidden="true">🪨</span>
+          <span id="mineral-name"></span>
+          <span id="mineral-mult" class="mineral-mult">×1</span>
+        </div>
+      </div>
+      <div class="hud-stats">
+        <div class="stat">
+          <span class="stat-label" data-i18n="hud.perSecond"></span>
+          <span id="pps" class="stat-value">0</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label" data-i18n="hud.perClick"></span>
+          <span id="per-click" class="stat-value">1</span>
+        </div>
+      </div>
+      <div class="hud-progress">
+        <div class="progress-bar" role="presentation"><div id="progress-fill" class="progress-fill"></div></div>
+        <div id="progress-label" class="progress-label"></div>
+        <div id="next-milestone" class="progress-label next-milestone" hidden></div>
+      </div>
+    </header>
+
+    <main class="stage">
+      <div id="challenge-banner" class="challenge-banner" role="status" hidden>
+        <span id="challenge-text" class="challenge-text"></span>
+        <button id="challenge-abandon" class="btn btn-small" type="button"></button>
+      </div>
+      <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+      <div id="ach-toast" class="toast ach-toast" role="status" aria-live="polite" hidden></div>
+      <div class="rock-wrap">
+        <button id="rock" class="rock" type="button" data-i18n-attr="aria-label:rock.aria">
+          <span id="rock-gem" class="rock-gem" aria-hidden="true"></span>
+        </button>
+        <div id="floaters" class="floaters" aria-hidden="true"></div>
+      </div>
+      <div id="intro" class="intro" role="status" hidden>
+        <div class="intro-head"><span id="intro-step" class="intro-step"></span><span id="intro-reward" class="intro-reward"></span></div>
+        <div id="intro-text" class="intro-text"></div>
+        <div class="intro-bar"><div id="intro-fill" class="intro-fill"></div></div>
+        <span id="intro-count" class="intro-count"></span>
+      </div>
+      <p class="hint" data-i18n="rock.hint"></p>
+      <div id="golden-layer" class="golden-layer"></div>
+    </main>
+
+    <aside class="shop">
+      <section class="shop-section">
+        <div class="shop-head">
+          <h2 class="shop-title" data-i18n="shop.producers"></h2>
+          <div id="buy-amount" class="seg" role="group" data-i18n-attr="aria-label:shop.amountAria"></div>
+        </div>
+        <div id="producers" class="shop-list"></div>
+      </section>
+      <section class="shop-section">
+        <div class="shop-head">
+          <h2 class="shop-title" data-i18n="shop.upgrades"></h2>
+          <button id="buy-all" class="btn btn-small" type="button" hidden data-i18n-attr="title:shop.buyAllHint"></button>
+        </div>
+        <div id="upgrades" class="shop-list"></div>
+        <p id="upgrades-empty" class="empty" data-i18n="shop.upgradesEmpty"></p>
+      </section>
+    </aside>
+
+  </div>
+
+  <!-- Anuncios: solo se enseñan con un proveedor configurado (config.ads.provider) y, el banner, con permiso del jugador. -->
+  <div id="ad-dock" class="ad-dock" hidden>
+    <div id="ad-consent" class="ad-consent" role="region" aria-labelledby="ad-consent-text" hidden>
+      <p id="ad-consent-text" class="ad-consent-text"><span data-i18n="ads.consentText"></span> <a href="privacy.html" target="_blank" rel="noopener" data-i18n="ads.privacyLink"></a></p>
+      <div class="opt-row ad-consent-actions">
+        <button id="ad-accept" class="btn btn-small can-buy" type="button" data-i18n="ads.accept"></button>
+        <button id="ad-decline" class="btn btn-small" type="button" data-i18n="ads.decline"></button>
+      </div>
+    </div>
+    <div id="ad-banner" class="ad-banner" hidden></div>
+  </div>
+
+  <div id="offline" class="modal" hidden>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="offline-title">
+      <h2 id="offline-title" class="modal-title" data-i18n="offline.title"></h2>
+      <p class="modal-lead" data-i18n="offline.mined"></p>
+      <p class="modal-amount"><span id="offline-amount">0</span> <span id="offline-unit"></span></p>
+      <p class="modal-lead" data-i18n="offline.whileAway"></p>
+      <p id="offline-detail" class="modal-detail"></p>
+      <p id="offline-mineral" class="modal-mineral" hidden></p>
+      <button id="offline-double" class="btn ad-reward" type="button" hidden></button>
+      <button id="offline-close" class="modal-button" type="button" data-i18n="offline.continue"></button>
+    </div>
+  </div>
+
+  <div id="achievements" class="modal" hidden>
+    <div class="modal-card ach-card" role="dialog" aria-modal="true" aria-labelledby="ach-title">
+      <h2 id="ach-title" class="modal-title" data-i18n="ach.title"></h2>
+      <div id="ach-tabs" class="seg ach-tabs" role="group"></div>
+      <div id="ach-grid-view">
+        <p id="ach-summary" class="ach-summary"></p>
+        <p id="ach-hint" class="opt-hint"></p>
+        <div id="ach-grid" class="medals"></div>
+      </div>
+      <ul id="ach-milestones" class="milestone-list" hidden></ul>
+      <dl id="ach-stats" class="stats" hidden></dl>
+      <div id="ach-report" class="report" hidden></div>
+      <div id="ach-share" class="opt-row ach-share" hidden>
+        <button id="share-open" class="btn" type="button" data-i18n="share.open"></button>
+      </div>
+      <button id="ach-close" class="modal-button" type="button" data-i18n="options.close"></button>
+    </div>
+  </div>
+
+  <div id="missions" class="modal" hidden>
+    <div class="modal-card missions-card" role="dialog" aria-modal="true" aria-labelledby="missions-title">
+      <h2 id="missions-title" class="modal-title" data-i18n="missions.title"></h2>
+      <p id="missions-streak" class="missions-streak"></p>
+
+      <section class="opt gift">
+        <span id="gift-text" class="gift-text"></span>
+        <button id="gift-claim" class="btn btn-prestige" type="button"></button>
+        <button id="gift-double" class="btn ad-reward" type="button" hidden></button>
+      </section>
+
+      <section class="opt">
+        <h3 class="opt-title" data-i18n="missions.today"></h3>
+        <div id="goal-list" class="goal-list"></div>
+        <p id="missions-all" class="opt-hint"></p>
+        <p id="missions-reset" class="opt-hint"></p>
+      </section>
+
+      <button id="missions-close" class="modal-button" type="button" data-i18n="options.close"></button>
+    </div>
+  </div>
+
+  <div id="summary" class="modal" hidden>
+    <div class="modal-card summary-card" role="dialog" aria-modal="true" aria-labelledby="summary-title">
+      <h2 id="summary-title" class="modal-title"></h2>
+      <p id="summary-highlight" class="summary-highlight"></p>
+      <div id="summary-grid" class="summary-grid"></div>
+      <p id="summary-cores" class="summary-cores"></p>
+      <div class="opt-row summary-actions">
+        <button id="summary-spend" class="btn btn-prestige" type="button" data-i18n="summary.spend"></button>
+        <button id="summary-share" class="btn" type="button" data-i18n="summary.share"></button>
+      </div>
+      <button id="summary-close" class="modal-button" type="button" data-i18n="summary.continue"></button>
+    </div>
+  </div>
+
+  <div id="challenges" class="modal" hidden>
+    <div class="modal-card challenges-card" role="dialog" aria-modal="true" aria-labelledby="challenges-title">
+      <h2 id="challenges-title" class="modal-title" data-i18n="challenges.title"></h2>
+      <p id="challenges-note" class="opt-hint"></p>
+      <div id="challenges-list" class="challenge-list"></div>
+      <button id="challenges-close" class="modal-button" type="button" data-i18n="options.close"></button>
+    </div>
+  </div>
+
+  <div id="share" class="modal" hidden>
+    <div class="modal-card share-card" role="dialog" aria-modal="true" aria-labelledby="share-title">
+      <h2 id="share-title" class="modal-title" data-i18n="share.title"></h2>
+      <canvas id="share-canvas" class="share-canvas" width="1080" height="1350"></canvas>
+      <p id="share-status" class="opt-hint" role="status"></p>
+      <div class="opt-row share-actions">
+        <button id="share-send" class="btn" type="button" hidden data-i18n="share.share"></button>
+        <button id="share-download" class="btn" type="button" data-i18n="share.download"></button>
+        <button id="share-copy" class="btn" type="button" hidden data-i18n="share.copy"></button>
+      </div>
+      <p class="opt-hint" data-i18n="share.hint"></p>
+      <button id="share-close" class="modal-button" type="button" data-i18n="options.close"></button>
+    </div>
+  </div>
+
+  <div id="dex" class="modal" hidden>
+    <div class="modal-card dex-card" role="dialog" aria-modal="true" aria-labelledby="dex-title">
+      <h2 id="dex-title" class="modal-title"></h2>
+      <div id="dex-tabs" class="seg dex-tabs" role="group"></div>
+      <p id="dex-progress" class="dex-progress"></p>
+      <div class="dex-bar"><div id="dex-fill" class="dex-fill"></div></div>
+      <p id="dex-bonus" class="opt-hint"></p>
+      <div id="dex-list" class="dex-list"></div>
+      <div id="catalog-list" class="dex-list" hidden></div>
+      <button id="dex-close" class="modal-button" type="button" data-i18n="options.close"></button>
+    </div>
+  </div>
+
+  <div id="prestige" class="modal" hidden>
+    <div class="modal-card prestige-card" role="dialog" aria-modal="true" aria-labelledby="prestige-title">
+      <h2 id="prestige-title" class="modal-title" data-i18n="prestige.title"></h2>
+
+      <div class="prestige-summary">
+        <div class="prestige-stat"><span id="prestige-cores" class="prestige-figure">0</span><span class="prestige-label" data-i18n="prestige.cores"></span></div>
+        <div class="prestige-stat"><span id="prestige-count" class="prestige-figure">0</span><span class="prestige-label" data-i18n="prestige.count"></span></div>
+      </div>
+
+      <section class="opt">
+        <p id="prestige-goal" class="prestige-goal"></p>
+        <p id="prestige-gain" class="prestige-gain"></p>
+        <p id="prestige-next" class="opt-hint"></p>
+        <p id="prestige-compare" class="opt-hint"></p>
+        <button id="prestige-do" class="btn btn-prestige" type="button"></button>
+        <button id="challenges-open" class="btn challenges-open" type="button" data-i18n="challenges.open"></button>
+        <p class="opt-hint" data-i18n="prestige.keep"></p>
+      </section>
+
+      <section class="opt">
+        <h3 class="opt-title" data-i18n="prestige.skills"></h3>
+        <div id="prestige-skills" class="skill-list"></div>
+      </section>
+
+      <section class="opt">
+        <h3 class="opt-title" data-i18n="prestige.milestones"></h3>
+        <ul id="prestige-milestones" class="milestones"></ul>
+      </section>
+
+      <button id="prestige-close" class="modal-button" type="button" data-i18n="options.close"></button>
+    </div>
+  </div>
+
+  <div id="options" class="modal" hidden>
+    <div class="modal-card options-card" role="dialog" aria-modal="true" aria-labelledby="options-title">
+      <h2 id="options-title" class="modal-title" data-i18n="options.title"></h2>
+
+      <section class="opt">
+        <h3 class="opt-title" data-i18n="options.language"></h3>
+        <div id="language-select" class="seg" role="group" data-i18n-attr="aria-label:options.language"></div>
+      </section>
+
+      <section class="opt">
+        <h3 class="opt-title" data-i18n="options.sound"></h3>
+        <div id="sound-select" class="seg" role="group" data-i18n-attr="aria-label:options.sound"></div>
+        <label class="opt-slider">
+          <span data-i18n="options.volume"></span>
+          <input id="volume" type="range" min="0" max="100" step="5">
+        </label>
+      </section>
+
+      <section class="opt">
+        <h3 class="opt-title" data-i18n="options.numbers"></h3>
+        <div id="notation-select" class="seg" role="group" data-i18n-attr="aria-label:options.numbers"></div>
+        <p id="notation-example" class="opt-hint"></p>
+      </section>
+
+      <section id="opt-ads" class="opt" hidden>
+        <h3 class="opt-title" data-i18n="ads.title"></h3>
+        <div id="ads-select" class="seg" role="group" data-i18n-attr="aria-label:ads.title"></div>
+        <p id="ads-hint" class="opt-hint"></p>
+        <p class="opt-hint"><a href="privacy.html" target="_blank" rel="noopener" data-i18n="ads.privacyLink"></a></p>
+      </section>
+
+      <section class="opt">
+        <h3 class="opt-title" data-i18n="options.game"></h3>
+        <div class="opt-row">
+          <button id="opt-save" class="btn" type="button" data-i18n="options.save"></button>
+          <button id="opt-export" class="btn" type="button" data-i18n="options.export"></button>
+          <button id="opt-import" class="btn" type="button" data-i18n="options.import"></button>
+        </div>
+        <p id="opt-status" class="opt-hint" role="status"></p>
+
+        <div id="transfer" class="transfer" hidden>
+          <label id="transfer-label" for="transfer-code" class="opt-hint"></label>
+          <textarea id="transfer-code" class="transfer-code" rows="4" spellcheck="false" autocomplete="off"></textarea>
+          <div class="opt-row">
+            <button id="transfer-copy" class="btn" type="button" hidden data-i18n="options.copy"></button>
+            <button id="transfer-download" class="btn" type="button" hidden data-i18n="options.download"></button>
+            <button id="transfer-pick" class="btn" type="button" hidden data-i18n="options.pickFile"></button>
+            <button id="transfer-apply" class="btn btn-warn" type="button" hidden data-i18n="options.apply"></button>
+          </div>
+          <input id="transfer-file" type="file" accept=".txt,text/plain" hidden>
+        </div>
+      </section>
+
+      <section class="opt">
+        <h3 class="opt-title" data-i18n="options.danger"></h3>
+        <button id="opt-reset" class="btn btn-danger" type="button" data-i18n="options.reset"></button>
+      </section>
+
+      <button id="options-close" class="modal-button" type="button" data-i18n="options.close"></button>
+    </div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/lang/es.js"></script>
+  <script src="js/lang/en.js"></script>
+  <script src="js/i18n.js"></script>
+  <script src="js/format.js"></script>
+  <script src="js/state.js"></script>
+  <script src="js/upgrades.js"></script>
+  <script src="js/minerals.js"></script>
+  <script src="js/game.js"></script>
+  <script src="js/biomes.js"></script>
+  <script src="js/events.js"></script>
+  <script src="js/prestige.js"></script>
+  <script src="js/milestones.js"></script>
+  <script src="js/dex.js"></script>
+  <script src="js/catalog.js"></script>
+  <script src="js/challenges.js"></script>
+  <script src="js/ads.js"></script>
+  <script src="js/share.js"></script>
+  <script src="js/missions.js"></script>
+  <script src="js/achievements.js"></script>
+  <script src="js/offline.js"></script>
+  <script src="js/save.js"></script>
+  <script src="js/gem.js"></script>
+  <script src="js/sound.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/options.js"></script>
+  <script src="js/achievements-panel.js"></script>
+  <script src="js/prestige-panel.js"></script>
+  <script src="js/events-ui.js"></script>
+  <script src="js/missions-panel.js"></script>
+  <script src="js/dex-panel.js"></script>
+  <script src="js/summary-panel.js"></script>
+  <script src="js/challenges-panel.js"></script>
+  <script src="js/share-ui.js"></script>
+  <script src="js/ads-ui.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

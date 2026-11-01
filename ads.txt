@@ -1,0 +1,4 @@
+# ads.txt: solo hace falta si usas Google AdSense (u otra red que lo pida).
+# Cuando te aprueben, sustituye esta línea por la que te dé AdSense, del estilo:
+#   google.com, pub-0000000000000000, DIRECT, f08c47fec0942fa0
+# (si no usas anuncios, puedes dejar este archivo como está: las líneas con # se ignoran)
