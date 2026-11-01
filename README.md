@@ -61,16 +61,18 @@ registros DNS que indica; en Cloudflare/Netlify, desde su panel). Luego actualiz
 
 ## Anuncios
 
-El juego trae el sistema de anuncios apagado (`ads.provider: 'none'`: no se carga ni se enseña nada). Cuando quieras
-activarlo, estas son las piezas (`js/ads.js` lógica, `js/ads-ui.js` interfaz y proveedores, bloque `ads` de `config.js`):
+Ahora mismo el proveedor es **Adsterra** (`ads.provider: 'adsterra'`), solo con banner. Con `'none'` el sistema queda
+apagado: no se carga ni se enseña nada. Piezas (`js/ads.js` lógica, `js/ads-ui.js` interfaz y proveedores, bloque `ads` de `config.js`):
 
 - **Consentimiento**: la primera vez (con proveedor activo) sale un aviso Aceptar/Rechazar. Hasta que el jugador acepta no
   se carga ningún script de anuncios. Se puede cambiar en Opciones → Anuncios.
-- **Banner** discreto abajo (320×50).
-- **Recompensados** (opcionales, nunca dentro de un reto): duplicar lo ganado estando fuera, duplicar el regalo diario y un
+- **Banner** discreto abajo (320×50). El de Adsterra se carga en un iframe aislado (`sandbox`): su script no puede leer la partida
+  guardada ni redirigir el juego; solo abrir el anuncio en otra pestaña cuando el jugador lo toca. La clave y la dirección del
+  script salen del código «Banner» del panel de Adsterra y van en `ads.adsterra` (`key`, `src`); si algo no cuadra, no se monta.
+- **Recompensados** (solo con un proveedor que los tenga, como AdSense o el de prueba; Adsterra no; opcionales y nunca dentro de un reto): duplicar lo ganado estando fuera, duplicar el regalo diario y un
   frenesí ×2 durante 2 min (uno cada 10 min). Valores en `config.ads.rewards`.
 
-Para usar Google AdSense:
+Para cambiar de Adsterra a Google AdSense (alternativa, que sí permitiría recompensados):
 
 1. Publica el sitio (con su dominio y la página de privacidad) y solicita la cuenta de AdSense; hay que esperar la aprobación.
 2. En `config.js`: `ads.provider: 'adsense'`, `ads.adsense.client` (`ca-pub-…`) y `ads.adsense.bannerSlot` (id del bloque).

@@ -1237,6 +1237,7 @@ h2 { margin: 0; }
 .ad-dock[hidden], .ad-consent[hidden], .ad-banner[hidden] { display: none; }
 
 .ad-banner { width: 320px; max-width: 100%; height: 50px; overflow: hidden; text-align: center; }
+.ad-frame { display: block; margin: 0 auto; border: 0; }
 .ad-banner-test { display: grid; place-items: center; height: 100%; border: 1px dashed var(--line); border-radius: 8px; color: var(--muted); font-size: 0.8rem; }
 
 .ad-consent { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px 14px; max-width: 760px; font-size: 0.82rem; }

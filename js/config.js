@@ -182,12 +182,14 @@ Game.config = {
   dex: { biomeBonus: 0.02 },
 
   // ── Anuncios (js/ads.js, js/ads-ui.js) ───────────────────
-  // provider: 'none' (sin anuncios: no se carga nada, no se enseña nada) | 'adsense' (Google AdSense, ver README.md)
-  // | 'test' (anuncios simulados para probar el flujo; NO publiques con esto: da recompensas gratis).
+  // provider: 'none' (sin anuncios: no se carga nada, no se enseña nada) | 'adsterra' (solo banner) | 'adsense'
+  // (Google AdSense, sin probar; ver README.md) | 'test' (anuncios simulados para probar el flujo; NO publiques
+  // con esto: da recompensas gratis).
   // En el equipo local, ?ads=test en la dirección activa el de prueba sin tocar esto.
   // Los anuncios solo se cargan si el jugador los acepta. Los recompensados nunca salen dentro de un reto.
   ads: {
-    provider: 'none',
+    provider: 'adsterra',
+    adsterra: { key: '330411031c68ccc27bd53664868d6d7c', src: 'https://bauval.org/22/330411031c68ccc27bd53664868d6d7c', width: 320, height: 50 }, // el código de «Banner» de tu panel de Adsterra
     adsense: { client: '', bannerSlot: '' }, // ca-pub-… de tu cuenta y el id del bloque de anuncio del banner
     banner: true, // banner discreto abajo (solo con proveedor y consentimiento)
     testSeconds: 3, // lo que dura el anuncio de prueba

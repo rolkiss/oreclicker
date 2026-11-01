@@ -1254,12 +1254,26 @@ const throwsMessage = (fn) => { try { fn(); return null; } catch (e) { return e.
   G.ads.registerProvider('stub', { isReady: () => ready, showRewarded: async () => { if (outcome === 'throw') throw new Error('x'); return outcome; } });
 
   // Config y valores por defecto
-  ok(['none', 'adsense', 'test'].includes(ac.provider), 'proveedor de anuncios conocido');
+  ok(['none', 'adsterra', 'adsense', 'test'].includes(ac.provider), 'proveedor de anuncios conocido');
   ok(ac.rewards.boost.mult > 1 && ac.rewards.boost.seconds > 0 && ac.rewards.boost.cooldown >= ac.rewards.boost.seconds, 'frenesí por anuncio coherente (el espacio entre anuncios no baja de su duración)');
-  ok(keep === 'none', 'por defecto no hay anuncios: lo que se publique no carga nada hasta que se configure');
+  ok(keep !== 'test', "nunca se publica con el proveedor de prueba (da recompensas gratis)");
   let s = fresh();
+  setProvider('none');
   ok(!G.ads.isEnabled() && !G.ads.needsConsent() && !G.ads.canOffer('offline') && !G.ads.canOffer('boost'), "con provider 'none' no se pide consentimiento ni se ofrece nada");
   ok(s.settings.adsConsent === 'unset' && s.ads.boostAt === 0, 'el estado empieza sin elegir y sin frenesí por anuncio');
+
+  // Banner de Adsterra: el documento del iframe se construye solo con datos válidos
+  const ad0 = { ...ac.adsterra };
+  ac.adsterra = { key: 'abc12345def', src: 'https://ejemplo.org/22/abc12345def', width: 320, height: 50 };
+  const doc = G.ads.adsterraDoc();
+  ok(doc && doc.includes('"key":"abc12345def"') && doc.includes('"format":"iframe"') && doc.includes('"height":50') && doc.includes('"width":320') && doc.includes('<script src="https://ejemplo.org/22/abc12345def"></script>'), 'el banner de Adsterra lleva su clave, formato, medidas y script');
+  for (const bad of [{ src: 'http://ejemplo.org/22/abc12345def' }, { src: 'javascript:alert(1)' }, { src: 'https://ejemplo.org/x"><script>alert(1)</script>' }, { src: '' }, { key: '' }, { key: 'a"b' }, { key: 'corta' }, { width: 0 }, { height: '50' }, { width: 3.5 }]) {
+    ac.adsterra = { key: 'abc12345def', src: 'https://ejemplo.org/22/abc12345def', width: 320, height: 50, ...bad };
+    ok(G.ads.adsterraDoc() === null, 'datos no válidos para el banner de Adsterra → no se monta (' + JSON.stringify(bad) + ')');
+  }
+  ac.adsterra = { key: '', src: '', width: 320, height: 50 }; ok(G.ads.adsterraDoc() === null, 'sin clave no hay banner');
+  ac.adsterra = ad0;
+  ok(ac.provider !== 'adsterra' || G.ads.adsterraDoc() !== null, "con provider 'adsterra' la clave y la dirección de config son válidas");
 
   // Consentimiento
   setProvider('stub');

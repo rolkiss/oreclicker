@@ -74,6 +74,10 @@ if (/provider:\s*'test'/.test(config)) {
   pending.push("js/config.js: ads.provider está en 'test' (pon 'none' o 'adsense')");
 }
 
+if (/provider:\s*'adsterra'/.test(config) && !/adsterra:\s*\{\s*key:\s*'[A-Za-z0-9]{8,}'/.test(config)) {
+  pending.push("js/config.js: ads.provider es 'adsterra' pero falta ads.adsterra.key / src");
+}
+
 console.log(`dist/ listo: ${copied} archivos, ${(bytes / 1024).toFixed(0)} KB, versión ${version}.`);
 if (pending.length) {
   console.log('\nFALTA RELLENAR antes de publicar:\n  ' + pending.join('\n  '));

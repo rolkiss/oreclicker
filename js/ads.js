@@ -31,6 +31,19 @@
     return true;
   };
 
+  // El banner de Adsterra va en un iframe aislado (srcdoc): este es su contenido, con el mismo código que da el panel
+  // (atOptions + script). Solo se acepta una dirección https sin comillas ni parámetros raros; si algo no cuadra, null.
+  Game.ads.adsterraDoc = function () {
+    const a = cfg.adsterra;
+    if (!a || !/^[A-Za-z0-9]{8,64}$/.test(a.key || '')) return null;
+    if (!/^https:\/\/[A-Za-z0-9.-]+\/[A-Za-z0-9._\/-]*$/.test(a.src || '')) return null;
+    if (!Number.isInteger(a.width) || !Number.isInteger(a.height) || a.width < 1 || a.height < 1) return null;
+    const options = { key: a.key, format: 'iframe', height: a.height, width: a.width, params: {} };
+    return '<!DOCTYPE html><html><head><meta charset="utf-8"></head><body style="margin:0">'
+      + '<script>atOptions = ' + JSON.stringify(options) + ';<\/script>'
+      + '<script src="' + a.src + '"><\/script></body></html>';
+  };
+
   // ── Anuncios recompensados ────────────────────────────────
   // Se ofrecen si hay proveedor listo y consentimiento, y nunca dentro de un reto (la vuelta es "limpia").
   Game.ads.canOffer = function (placement) {
