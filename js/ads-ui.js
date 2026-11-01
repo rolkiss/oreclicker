@@ -67,18 +67,36 @@
   // El código de Adsterra se ejecuta dentro de un iframe que carga ad-banner.html. Necesita `allow-same-origin` (cookies
   // y la dirección real del sitio), así que NO está aislado de la partida guardada; el `sandbox` sigue impidiendo que
   // redirija el juego a otro sitio sin que el jugador toque el anuncio (sin `allow-top-navigation`).
+  function adsterraFrame(slot) {
+    if (!Game.ads.adsterraSnippet(slot)) return null;
+    const size = cfg.adsterra[slot];
+    const frame = document.createElement('iframe');
+    frame.className = 'ad-frame';
+    frame.width = String(size.width);
+    frame.height = String(size.height);
+    frame.setAttribute('scrolling', 'no');
+    frame.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-top-navigation-by-user-activation');
+    frame.title = tr('ads.frameTitle');
+    frame.src = 'ad-banner.html?slot=' + slot;
+    return frame;
+  }
+
   Game.ads.registerProvider('adsterra', {
     isReady: () => false,
+    // Abajo del juego: el ancho (468) no cabe en un móvil, donde se usa el pequeño.
     mountBanner(container) {
-      if (!Game.ads.adsterraSnippet()) return false;
-      const frame = document.createElement('iframe');
-      frame.className = 'ad-frame';
-      frame.width = String(cfg.adsterra.width);
-      frame.height = String(cfg.adsterra.height);
-      frame.setAttribute('scrolling', 'no');
-      frame.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-top-navigation-by-user-activation');
-      frame.title = tr('ads.frameTitle');
-      frame.src = 'ad-banner.html';
+      const wide = cfg.adsterra.bottom;
+      const frame = (wide && window.innerWidth >= wide.width + 24 && adsterraFrame('bottom')) || adsterraFrame('gate');
+      if (!frame) return false;
+      container.style.width = frame.width + 'px';
+      container.style.height = frame.height + 'px';
+      container.append(frame);
+      return true;
+    },
+    // Dentro de la ventana «Antes de jugar», bajo el botón.
+    mountGateBanner(container) {
+      const frame = adsterraFrame('gate');
+      if (!frame) return false;
       container.append(frame);
       return true;
     },
@@ -132,7 +150,7 @@
 
   // ── Arranque ──────────────────────────────────────────────
   function init() {
-    for (const id of ['ad-dock', 'ad-gate', 'ad-accept', 'ad-banner', 'ad-boost',
+    for (const id of ['ad-dock', 'ad-gate', 'ad-gate-banner', 'ad-accept', 'ad-banner', 'ad-boost',
                       'offline', 'offline-double', 'gift-double', 'missions', 'gift-claim']) {
       els[id] = $(id);
     }
@@ -216,10 +234,14 @@
     const askConsent = enabled && delayed && Game.ads.needsConsent();
     if (askConsent && els['ad-gate'].hidden) {
       Game.ui.openModal(els['ad-gate'], els['ad-accept']);
+      // La ventana lleva su propio banner bajo el botón (se carga ya, antes de aceptar).
+      if (cfg.banner && provider.mountGateBanner) els['ad-gate-banner'].hidden = provider.mountGateBanner(els['ad-gate-banner']) === false;
     } else if (!askConsent && !els['ad-gate'].hidden) {
       els['ad-gate'].dataset.locked = 'false';
       Game.ui.closeModal(els['ad-gate']);
       els['ad-gate'].dataset.locked = 'true';
+      els['ad-gate-banner'].replaceChildren();
+      els['ad-gate-banner'].hidden = true;
     }
     setHidden(els['ad-banner'], bannerState !== 'shown');
     setHidden(els['ad-dock'], bannerState !== 'shown');

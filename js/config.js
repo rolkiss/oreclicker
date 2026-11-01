@@ -189,7 +189,11 @@ Game.config = {
   // Los anuncios solo se cargan si el jugador los acepta. Los recompensados nunca salen dentro de un reto.
   ads: {
     provider: 'adsterra',
-    adsterra: { key: '330411031c68ccc27bd53664868d6d7c', src: 'https://bauval.org/22/330411031c68ccc27bd53664868d6d7c', width: 320, height: 50 }, // el código de «Banner» de tu panel de Adsterra
+    // Adsterra: un bloque «Banner» por sitio, con el código de su panel (clave, dirección del script y medidas).
+    adsterra: {
+      gate: { key: '330411031c68ccc27bd53664868d6d7c', src: 'https://bauval.org/22/330411031c68ccc27bd53664868d6d7c', width: 320, height: 50 }, // en la ventana «Antes de jugar», bajo el botón
+      bottom: { key: '05df618aa4e7f5376ec797fe58ba0f78', src: 'https://bauval.org/22/05df618aa4e7f5376ec797fe58ba0f78', width: 468, height: 60 }, // abajo del juego (en pantallas estrechas se usa el de arriba)
+    },
     adsense: { client: '', bannerSlot: '' }, // ca-pub-… de tu cuenta y el id del bloque de anuncio del banner
     banner: true, // banner discreto abajo (solo con proveedor y consentimiento)
     startDelaySeconds: 1, // el aviso de consentimiento y el banner aparecen a 1 s de entrar en la web

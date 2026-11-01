@@ -6,9 +6,9 @@
   <title>Publicidad</title>
 </head>
 <body style="margin:0;overflow:hidden">
-  <!-- Marco del banner: lo carga el juego en un iframe (js/ads-ui.js). Escribe el código de Adsterra con los datos de config.ads.adsterra. -->
+  <!-- Marco del banner: lo carga el juego en un iframe (js/ads-ui.js). Escribe el código de Adsterra con los datos de config.ads.adsterra del bloque que pide la dirección (?slot=gate o ?slot=bottom). -->
   <script src="js/config.js"></script>
   <script src="js/ads.js"></script>
-  <script>document.write(Game.ads.adsterraSnippet() || '');</script>
+  <script>document.write(Game.ads.adsterraSnippet(new URLSearchParams(location.search).get('slot') || 'bottom') || '');</script>
 </body>
 </html>

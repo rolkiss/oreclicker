@@ -74,8 +74,10 @@ if (/provider:\s*'test'/.test(config)) {
   pending.push("js/config.js: ads.provider está en 'test' (pon 'none' o 'adsense')");
 }
 
-if (/provider:\s*'adsterra'/.test(config) && !/adsterra:\s*\{\s*key:\s*'[A-Za-z0-9]{8,}'/.test(config)) {
-  pending.push("js/config.js: ads.provider es 'adsterra' pero falta ads.adsterra.key / src");
+if (/provider:\s*'adsterra'/.test(config)) {
+  for (const slot of ['gate', 'bottom']) {
+    if (!new RegExp(slot + ":\\s*\\{\\s*key:\\s*'[A-Za-z0-9]{8,}'").test(config)) pending.push("js/config.js: ads.provider es 'adsterra' pero falta ads.adsterra." + slot + " (key / src)");
+  }
 }
 
 console.log(`dist/ listo: ${copied} archivos, ${(bytes / 1024).toFixed(0)} KB, versión ${version}.`);

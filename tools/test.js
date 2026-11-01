@@ -1274,18 +1274,25 @@ const throwsMessage = (fn) => { try { fn(); return null; } catch (e) { return e.
   ok(!G.ads.isEnabled() && !G.ads.needsConsent() && !G.ads.canOffer('offline') && !G.ads.canOffer('boost'), "con provider 'none' no se pide consentimiento ni se ofrece nada");
   ok(s.settings.adsConsent === 'unset' && s.ads.boostAt === 0, 'el estado empieza sin elegir y sin frenesí por anuncio');
 
-  // Banner de Adsterra: el fragmento de ad-banner.html se construye solo con datos válidos
-  const ad0 = { ...ac.adsterra };
-  ac.adsterra = { key: 'abc12345def', src: 'https://ejemplo.org/22/abc12345def', width: 320, height: 50 };
-  const doc = G.ads.adsterraSnippet();
+  // Banners de Adsterra: el fragmento de ad-banner.html se construye solo con datos válidos, por sitio
+  const ad0 = ac.adsterra;
+  const slot = (extra) => ({ key: 'abc12345def', src: 'https://ejemplo.org/22/abc12345def', width: 320, height: 50, ...extra });
+  ac.adsterra = { bottom: slot(), gate: slot({ key: 'xyz98765uvw', src: 'https://ejemplo.org/22/xyz98765uvw', width: 468, height: 60 }) };
+  const doc = G.ads.adsterraSnippet('bottom');
   ok(doc && doc.includes('"key":"abc12345def"') && doc.includes('"format":"iframe"') && doc.includes('"height":50') && doc.includes('"width":320') && doc.includes('<script src="https://ejemplo.org/22/abc12345def"></script>'), 'el banner de Adsterra lleva su clave, formato, medidas y script');
+  const gateDoc = G.ads.adsterraSnippet('gate');
+  ok(gateDoc && gateDoc.includes('"key":"xyz98765uvw"') && gateDoc.includes('"width":468') && gateDoc.includes('"height":60') && gateDoc.includes('/22/xyz98765uvw"'), 'cada sitio usa su propio bloque');
+  ok(G.ads.adsterraSnippet() === doc, 'sin indicar sitio se usa el de abajo');
+  ok(G.ads.adsterraSnippet('otro') === null && G.ads.adsterraSnippet('__proto__') === null && G.ads.adsterraSnippet('constructor') === null, 'un sitio desconocido no se monta');
   for (const bad of [{ src: 'http://ejemplo.org/22/abc12345def' }, { src: 'javascript:alert(1)' }, { src: 'https://ejemplo.org/x"><script>alert(1)</script>' }, { src: '' }, { key: '' }, { key: 'a"b' }, { key: 'corta' }, { width: 0 }, { height: '50' }, { width: 3.5 }]) {
-    ac.adsterra = { key: 'abc12345def', src: 'https://ejemplo.org/22/abc12345def', width: 320, height: 50, ...bad };
-    ok(G.ads.adsterraSnippet() === null, 'datos no válidos para el banner de Adsterra → no se monta (' + JSON.stringify(bad) + ')');
+    ac.adsterra = { bottom: slot(bad) };
+    ok(G.ads.adsterraSnippet('bottom') === null, 'datos no válidos para el banner de Adsterra → no se monta (' + JSON.stringify(bad) + ')');
   }
-  ac.adsterra = { key: '', src: '', width: 320, height: 50 }; ok(G.ads.adsterraSnippet() === null, 'sin clave no hay banner');
+  ac.adsterra = { bottom: slot({ key: '', src: '' }) }; ok(G.ads.adsterraSnippet() === null, 'sin clave no hay banner');
+  ac.adsterra = {}; ok(G.ads.adsterraSnippet() === null && G.ads.adsterraSnippet('gate') === null, 'sin bloques no hay banner');
   ac.adsterra = ad0;
-  ok(ac.provider !== 'adsterra' || G.ads.adsterraSnippet() !== null, "con provider 'adsterra' la clave y la dirección de config son válidas");
+  ok(ac.provider !== 'adsterra' || (G.ads.adsterraSnippet('bottom') !== null && G.ads.adsterraSnippet('gate') !== null), "con provider 'adsterra' los dos bloques de config son válidos");
+  ok(ac.provider !== 'adsterra' || (ac.adsterra.gate.width === 320 && ac.adsterra.gate.height === 50 && ac.adsterra.bottom.width === 468 && ac.adsterra.bottom.height === 60), 'los bloques son 320×50 (ventana) y 468×60 (abajo)');
 
   // Consentimiento
   setProvider('stub');

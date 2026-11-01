@@ -38,9 +38,10 @@
   // necesita ver la dirección de la web, y en un iframe srcdoc no la ve y no sirve anuncios). Este es el fragmento que
   // escribe esa página, con el mismo código que da el panel (atOptions + script). Solo se acepta una dirección https
   // sin comillas ni parámetros raros; si algo no cuadra, null.
-  Game.ads.adsterraSnippet = function () {
-    const a = cfg.adsterra;
-    if (!a || !/^[A-Za-z0-9]{8,64}$/.test(a.key || '')) return null;
+  Game.ads.adsterraSnippet = function (slot = 'bottom') {
+    const a = cfg.adsterra && Object.prototype.hasOwnProperty.call(cfg.adsterra, slot) ? cfg.adsterra[slot] : null; // 'gate' (ventana de aviso) o 'bottom' (abajo)
+    if (!a) return null;
+    if (!/^[A-Za-z0-9]{8,64}$/.test(a.key || '')) return null;
     if (!/^https:\/\/[A-Za-z0-9.-]+\/[A-Za-z0-9._\/-]*$/.test(a.src || '')) return null;
     if (!Number.isInteger(a.width) || !Number.isInteger(a.height) || a.width < 1 || a.height < 1) return null;
     const options = { key: a.key, format: 'iframe', height: a.height, width: a.width, params: {} };
