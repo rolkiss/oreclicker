@@ -16,7 +16,7 @@ const root = path.join(__dirname, '..');
 const out = path.join(root, 'dist');
 const strict = process.argv.includes('--strict');
 
-const FILES = ['index.html', 'privacy.html', '404.html', 'robots.txt', 'ads.txt', 'favicon.svg']; // en la raíz
+const FILES = ['index.html', 'privacy.html', 'ad-test.html', '404.html', 'robots.txt', 'ads.txt', 'favicon.svg']; // en la raíz
 const DIRS = ['css', 'js'];
 
 function walk(dir) {
