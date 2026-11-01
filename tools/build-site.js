@@ -16,7 +16,7 @@ const root = path.join(__dirname, '..');
 const out = path.join(root, 'dist');
 const strict = process.argv.includes('--strict');
 
-const FILES = ['index.html', 'privacy.html', 'ad-test.html', '404.html', 'robots.txt', 'ads.txt', 'favicon.svg']; // en la raíz
+const FILES = ['index.html', 'privacy.html', 'ad-test.html', 'ad-banner.html', '404.html', 'robots.txt', 'ads.txt', 'favicon.svg']; // en la raíz
 const DIRS = ['css', 'js'];
 
 function walk(dir) {
@@ -49,7 +49,7 @@ for (const dir of DIRS) {
 for (const name of FILES) {
   const from = path.join(root, name);
   if (!fs.existsSync(from)) { console.log('AVISO: falta ' + name); continue; }
-  if (name === 'index.html') {
+  if (name === 'index.html' || name === 'ad-banner.html') {
     // ?v=sello en cada script y hoja de estilos locales
     const html = fs.readFileSync(from, 'utf8').replace(/(src|href)="((?:js|css)\/[^"?]+)"/g, '$1="$2?v=' + version + '"');
     fs.writeFileSync(path.join(out, name), html);

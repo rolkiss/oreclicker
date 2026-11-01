@@ -64,22 +64,21 @@
   });
 
   // ── Adsterra: solo banner (no tiene anuncios recompensados, así que no se ofrece ninguno) ──
-  // El código de Adsterra se ejecuta dentro de un iframe aislado: sin `allow-same-origin` no puede leer la partida
-  // guardada ni el resto de la página, y sin `allow-top-navigation` no puede redirigir el juego a otro sitio (solo
-  // abrir el anuncio en otra pestaña cuando el jugador lo toca).
+  // El código de Adsterra se ejecuta dentro de un iframe que carga ad-banner.html. Necesita `allow-same-origin` (cookies
+  // y la dirección real del sitio), así que NO está aislado de la partida guardada; el `sandbox` sigue impidiendo que
+  // redirija el juego a otro sitio sin que el jugador toque el anuncio (sin `allow-top-navigation`).
   Game.ads.registerProvider('adsterra', {
     isReady: () => false,
     mountBanner(container) {
-      const doc = Game.ads.adsterraDoc();
-      if (!doc) return false;
+      if (!Game.ads.adsterraSnippet()) return false;
       const frame = document.createElement('iframe');
       frame.className = 'ad-frame';
       frame.width = String(cfg.adsterra.width);
       frame.height = String(cfg.adsterra.height);
       frame.setAttribute('scrolling', 'no');
-      frame.setAttribute('sandbox', 'allow-scripts allow-popups allow-popups-to-escape-sandbox allow-top-navigation-by-user-activation');
+      frame.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-top-navigation-by-user-activation');
       frame.title = tr('ads.frameTitle');
-      frame.srcdoc = doc;
+      frame.src = 'ad-banner.html';
       container.append(frame);
       return true;
     },
