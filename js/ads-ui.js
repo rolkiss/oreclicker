@@ -11,6 +11,8 @@
   let busy = false; // hay un anuncio en curso: los botones esperan
   let started = false; // el proveedor ya se puso en marcha (solo ocurre con consentimiento)
   let bannerState = 'none'; // 'none' | 'shown' | 'failed'
+  let bannerMountedAt = 0; // performance.now() cuando se montó (o renovó) el banner de abajo
+  let lastActivity = 0; // performance.now() de la última pulsación o tecla del jugador
   let offlineSummary = null; // el aviso de bienvenida abierto, para duplicarlo
 
   function setText(node, text) {
@@ -83,6 +85,7 @@
 
   Game.ads.registerProvider('adsterra', {
     isReady: () => false,
+    refreshable: true, // el banner de abajo se puede renovar (ver config.ads.refreshSeconds)
     // Abajo del juego: el ancho (468) no cabe en un móvil, donde se usa el pequeño.
     mountBanner(container) {
       const wide = cfg.adsterra.bottom;
@@ -175,6 +178,11 @@
       }).observe(els['ad-dock']);
     }
 
+    // Actividad del jugador: el banner solo se renueva si está jugando.
+    const touch = () => { lastActivity = performance.now(); };
+    document.addEventListener('pointerdown', touch, true);
+    document.addEventListener('keydown', touch, true);
+
     Game.ui.onRender(render);
     render();
   }
@@ -224,6 +232,13 @@
       }
       if (cfg.banner && bannerState === 'none' && provider.mountBanner) {
         bannerState = provider.mountBanner(els['ad-banner']) === false ? 'failed' : 'shown';
+        bannerMountedAt = performance.now();
+      } else if (bannerState === 'shown' && provider.refreshable
+        && Game.ads.shouldRefresh(performance.now(), bannerMountedAt, lastActivity, document.visibilityState === 'visible' && document.hasFocus())) {
+        // Anuncio nuevo: se vuelve a montar el marco (mismo tamaño, sin saltos en la pantalla).
+        els['ad-banner'].replaceChildren();
+        provider.mountBanner(els['ad-banner']);
+        bannerMountedAt = performance.now();
       }
     } else if (!granted && bannerState !== 'none') {
       els['ad-banner'].replaceChildren();

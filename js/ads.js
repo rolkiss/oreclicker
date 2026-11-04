@@ -49,6 +49,13 @@
       + '<script src="' + a.src + '"><\/script>';
   };
 
+  // ¿Toca renovar el banner? Solo si pasó el intervalo, la pestaña se ve y el jugador hizo algo hace poco: no se pide
+  // un anuncio nuevo a quien no está mirando. Los tiempos son milisegundos de reloj (performance.now()).
+  Game.ads.shouldRefresh = function (now, mountedAt, lastActivityAt, visible) {
+    if (!(cfg.refreshSeconds > 0) || !visible) return false;
+    return now - mountedAt >= cfg.refreshSeconds * 1000 && now - lastActivityAt <= cfg.refreshActiveSeconds * 1000;
+  };
+
   // ── Anuncios recompensados ────────────────────────────────
   // Se ofrecen si hay proveedor listo y consentimiento, y nunca dentro de un reto (la vuelta es "limpia").
   Game.ads.canOffer = function (placement) {

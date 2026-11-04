@@ -1294,6 +1294,18 @@ const throwsMessage = (fn) => { try { fn(); return null; } catch (e) { return e.
   ok(ac.provider !== 'adsterra' || (G.ads.adsterraSnippet('bottom') !== null && G.ads.adsterraSnippet('gate') !== null), "con provider 'adsterra' los dos bloques de config son válidos");
   ok(ac.provider !== 'adsterra' || (ac.adsterra.gate.width === 320 && ac.adsterra.gate.height === 50 && ac.adsterra.bottom.width === 468 && ac.adsterra.bottom.height === 60), 'los bloques son 320×50 (ventana) y 468×60 (abajo)');
 
+  // Renovar el banner: solo con intervalo cumplido, pestaña a la vista y jugador activo
+  {
+    const sec = ac.refreshSeconds, act = ac.refreshActiveSeconds;
+    ok(sec >= 30 && act > 0 && act <= sec, 'el banner no se renueva más rápido que cada 30 s y solo con actividad reciente');
+    const t = 1_000_000;
+    ok(G.ads.shouldRefresh(t, t - sec * 1000, t - 1000, true), 'pasado el intervalo y con el jugador activo: se renueva');
+    ok(!G.ads.shouldRefresh(t, t - sec * 1000 + 1, t - 1000, true), 'antes del intervalo no');
+    ok(!G.ads.shouldRefresh(t, t - sec * 1000 * 5, t - 1000, false), 'con la pestaña oculta o sin foco no');
+    ok(!G.ads.shouldRefresh(t, t - sec * 1000 * 5, t - act * 1000 - 1, true), 'si el jugador lleva rato sin hacer nada no');
+    ac.refreshSeconds = 0; ok(!G.ads.shouldRefresh(t, 0, t, true), 'con refreshSeconds 0 nunca se renueva'); ac.refreshSeconds = sec;
+  }
+
   // Consentimiento
   setProvider('stub');
   ok(G.ads.isEnabled() && G.ads.needsConsent() && !G.ads.hasConsent(), 'con proveedor y sin elegir: hay que pedir consentimiento');

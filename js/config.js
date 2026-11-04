@@ -196,6 +196,11 @@ Game.config = {
     },
     adsense: { client: '', bannerSlot: '' }, // ca-pub-… de tu cuenta y el id del bloque de anuncio del banner
     banner: true, // banner discreto abajo (solo con proveedor y consentimiento)
+    // El banner de abajo se renueva solo (nuevo anuncio) cada `refreshSeconds` mientras el jugador está jugando:
+    // con la pestaña a la vista y alguna acción en los últimos `refreshActiveSeconds`. 0 = no renovar.
+    // Solo lo hace Adsterra; con AdSense está prohibido renovar. Comprueba que tu red lo permita.
+    refreshSeconds: 60,
+    refreshActiveSeconds: 30,
     startDelaySeconds: 1, // el aviso de consentimiento y el banner aparecen a 1 s de entrar en la web
     testSeconds: 3, // lo que dura el anuncio de prueba
     rewards: {
