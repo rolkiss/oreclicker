@@ -1294,6 +1294,17 @@ const throwsMessage = (fn) => { try { fn(); return null; } catch (e) { return e.
   ok(ac.provider !== 'adsterra' || (G.ads.adsterraSnippet('bottom') !== null && G.ads.adsterraSnippet('gate') !== null), "con provider 'adsterra' los dos bloques de config son válidos");
   ok(ac.provider !== 'adsterra' || (ac.adsterra.gate.width === 320 && ac.adsterra.gate.height === 50 && ac.adsterra.bottom.width === 468 && ac.adsterra.bottom.height === 60), 'los bloques son 320×50 (ventana) y 468×60 (abajo)');
 
+  // Social Bar de Adsterra: solo una dirección https válida
+  {
+    const sb0 = ac.adsterra.socialBar;
+    ok(ac.provider !== 'adsterra' || G.ads.adsterraSocialBarSrc() === sb0, 'la dirección del Social Bar de config es válida');
+    for (const bad of ['http://x.org/14/abc', 'javascript:alert(1)', 'https://x.org/a"><script>', '', null, 123, undefined]) {
+      ac.adsterra.socialBar = bad; ok(G.ads.adsterraSocialBarSrc() === null, 'dirección no válida del Social Bar → no se carga (' + String(bad) + ')');
+    }
+    ac.adsterra.socialBar = 'https://ejemplo.org/14/abc12345'; ok(G.ads.adsterraSocialBarSrc() === 'https://ejemplo.org/14/abc12345', 'una dirección https válida se acepta');
+    ac.adsterra.socialBar = sb0;
+  }
+
   // Renovar el banner: solo con intervalo cumplido, pestaña a la vista y jugador activo
   {
     const sec = ac.refreshSeconds, act = ac.refreshActiveSeconds;

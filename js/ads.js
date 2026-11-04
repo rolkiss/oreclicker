@@ -49,6 +49,12 @@
       + '<script src="' + a.src + '"><\/script>';
   };
 
+  // Dirección del script del Social Bar de Adsterra (solo https y sin caracteres raros), o null si no hay o no es válida.
+  Game.ads.adsterraSocialBarSrc = function () {
+    const src = cfg.adsterra && cfg.adsterra.socialBar;
+    return typeof src === 'string' && /^https:\/\/[A-Za-z0-9.-]+\/[A-Za-z0-9._\/-]*$/.test(src) ? src : null;
+  };
+
   // ¿Toca renovar el banner? Solo si pasó el intervalo, la pestaña se ve y el jugador hizo algo hace poco: no se pide
   // un anuncio nuevo a quien no está mirando. Los tiempos son milisegundos de reloj (performance.now()).
   Game.ads.shouldRefresh = function (now, mountedAt, lastActivityAt, visible) {

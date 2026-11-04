@@ -86,6 +86,18 @@
   Game.ads.registerProvider('adsterra', {
     isReady: () => false,
     refreshable: true, // el banner de abajo se puede renovar (ver config.ads.refreshSeconds)
+    // Social Bar: un script que dibuja avisos publicitarios en una esquina. Se carga una sola vez y solo tras aceptar
+    // (render() llama a load() con consentimiento). Corre en la página del juego, no en un marco.
+    load() {
+      const src = Game.ads.adsterraSocialBarSrc();
+      if (!src || document.getElementById('adsterra-social-bar')) return;
+      const script = document.createElement('script');
+      script.id = 'adsterra-social-bar';
+      script.setAttribute('data-cfasync', 'false');
+      script.async = true;
+      script.src = src;
+      document.body.append(script);
+    },
     // Abajo del juego: el ancho (468) no cabe en un móvil, donde se usa el pequeño.
     mountBanner(container) {
       const wide = cfg.adsterra.bottom;

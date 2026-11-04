@@ -191,6 +191,8 @@ Game.config = {
     provider: 'adsterra',
     // Adsterra: un bloque «Banner» por sitio, con el código de su panel (clave, dirección del script y medidas).
     adsterra: {
+      // Social Bar: avisos publicitarios flotantes en una esquina. Se carga solo tras aceptar. '' o quitar la línea = sin Social Bar.
+      socialBar: 'https://bauval.org/14/8ab7542f82e65ad6bba3248ecfb8a4b8',
       gate: { key: '330411031c68ccc27bd53664868d6d7c', src: 'https://bauval.org/22/330411031c68ccc27bd53664868d6d7c', width: 320, height: 50 }, // en la ventana «Antes de jugar», bajo el botón
       bottom: { key: '05df618aa4e7f5376ec797fe58ba0f78', src: 'https://bauval.org/22/05df618aa4e7f5376ec797fe58ba0f78', width: 468, height: 60 }, // abajo del juego (en pantallas estrechas se usa el de arriba)
     },
